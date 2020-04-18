@@ -7,6 +7,12 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+.vscode
+[Ii]nclude/
+[Ll]ib/
+[Ll]ist/
+[Tt]ests/
+[Ss]cripts/
 .Python
 build/
 develop-eggs/
@@ -127,3 +133,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# other
+pyvenv.cfg
