@@ -1,9 +1,8 @@
 # settings.py
-import settings
 import os
 import discord
 from discord.ext import commands
-
+import settings
 
 class pokemon:
     num: 1
