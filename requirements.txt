@@ -2,3 +2,4 @@ python-dotenv
 discord 
 pylint 
 autopep8
+git+https://github.com/slice/clyde@master#egg=clyde
