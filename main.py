@@ -4,54 +4,53 @@ import os
 import discord
 from discord.ext import commands
 
+
 class pokemon:
     num: 1
     name: "Bulbasaur"
     types: ["Grass", "Poison"]
     genderRatio: {
-      "M": 0.875,
-      "F": 0.125
+        "M": 0.875,
+        "F": 0.125
     }
     baseStats: {
-      "hp": 45,
-      "atk": 49,
-      "def": 49,
-      "spa": 65,
-      "spd": 65,
-      "spe": 45,
+        "hp": 45,
+        "atk": 49,
+        "def": 49,
+        "spa": 65,
+        "spd": 65,
+        "spe": 45,
     }
     abilities: {
-      "0": "Overgrow",
-      "H": "Chlorophyll"
+        "0": "Overgrow",
+        "H": "Chlorophyll"
     }
     heightm: 0.7
     weightkg: 6.9
     color: "Green"
-    evos: ["ivysaur"]
-    eggGroups: ["Monster", "Grass"]
     tier: "LC"
 
     def __init__(self):
         print("Species {}".format(self.name))
+
 
 class OC:
     def __init__(self):
         self.name = "Null"
         self.species = pokemon()
         self.userID = 0
+        self.finalStats: {
+            "hp": 294,
+            "atk": 216,
+            "def": 216,
+            "spa": 251,
+            "spd": 251,
+            "spe": 207
+        }
         print("Registered OC")
 
-    finalStats: {
-        "hp": 294,
-        "atk": 216,
-        "def": 216,
-        "spa": 251,
-        "spd": 251,
-        "spe": 207
-    }
-
     def __del__(self):
-        print("Deleted OC",self.name)
+        print("Deleted OC", self.name)
 
     def __str__(self):
         return '{}'.format(self.name)
@@ -62,19 +61,24 @@ class OC:
     def register(self):
         self.name = "Registered"
 
+
 class ListOC:
     OC = []
-    def __init__(self,OC=[]):
+
+    def __init__(self, OC=[]):
         self.OC = OC
 
-    def add(self,OC):
+    def add(self, OC):
         self.OC.append(OC)
 
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD_TOKEN =  os.getenv("GUILD_ID")
 
-bot = commands.Bot(command_prefix='$', description='A bot that greets the user back.')
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+GUILD_TOKEN = os.getenv("GUILD_ID")
+
+bot = commands.Bot(command_prefix='$',
+                   description='A bot that greets the user back.')
 bot.remove_command('help')
+
 
 @bot.event
 async def on_ready():
@@ -83,18 +87,22 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
+
 @bot.event
 async def on_member_join(member, guild):
     await member.create_dm()
     await member.dm_channel.send(f'Hi {member.name}, welcome to {guild.name}')
 
+
 @bot.event
 async def on_member_leave(member, guild):
     print(f'{member} has left the server')
 
+
 @bot.command()
 async def add(ctx, a: int, b: int):
     await ctx.send(a+b)
+
 
 @bot.command(pass_context=True)
 async def help(ctx, args=''):
@@ -103,7 +111,8 @@ async def help(ctx, args=''):
         colour=discord.Colour.dark_red()
     )
     embed.set_author(name='Help')
-    embed.add_field(name='{}Help'.format(bot.command_prefix), value='Main Help command, 3 pages.', inline=False)
+    embed.add_field(name='{}Help'.format(bot.command_prefix),
+                    value='Main Help command, 3 pages.', inline=False)
     if args == '1':
         embed.add_field(
             name='{}register <name>'.format(bot.command_prefix),
