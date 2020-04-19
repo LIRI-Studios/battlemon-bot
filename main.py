@@ -4,14 +4,81 @@ import os
 import discord
 from discord.ext import commands
 
+class pokemon:
+    num: 1,
+    name: "Bulbasaur"
+    types: ["Grass", "Poison"]
+    genderRatio: {
+      M: 0.875,
+      F: 0.125
+    }
+    baseStats: {
+      hp: 45,
+      atk: 49,
+      def: 49,
+      spa: 65,
+      spd: 65,
+      spe: 45
+    }
+    abilities: {
+      "0": "Overgrow",
+      H: "Chlorophyll"
+    }
+    heightm: 0.7
+    weightkg: 6.9
+    color: "Green"
+    evos: ["ivysaur"]
+    eggGroups: ["Monster", "Grass"]
+    tier: "LC"
+
+    def __init__(self):
+        print("Species {}".format(self.name))
+
+class OC:
+    def __init__(self):
+        self.name = "Null"
+        self.species = pokemon()
+        self.userID = 0
+        print("Registered OC")
+
+    finalStats: {
+        hp: 294,
+        atk: 216,
+        def: 216,
+        spa: 251,
+        spd: 251,
+        spe: 207
+    }
+
+    def __del__(self):
+        print("Deleted OC",self.name)
+
+    def __str__(self):
+        return '{}'.format(self.name)
+
+    # def __len__(self):
+    #    return self.tiempo
+
+    def register(self):
+        self.name = "Registered"
+
+class ListOC:
+    OC = []
+    def __init__(self,OC=[]):
+        self.OC = OC
+
+    def add(self,OC):
+        self.OC.append(OC)
+
+    def view(self):
+        for x in self.OC
+            print(x)
+
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_TOKEN =  os.getenv("GUILD_ID")
 
 bot = commands.Bot(command_prefix='$', description='A bot that greets the user back.')
 bot.remove_command('help')
-
-def damage():
-    pass
 
 @bot.event
 async def on_ready():
