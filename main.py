@@ -5,24 +5,24 @@ import discord
 from discord.ext import commands
 
 class pokemon:
-    num: 1,
+    num: 1
     name: "Bulbasaur"
     types: ["Grass", "Poison"]
     genderRatio: {
-      M: 0.875,
-      F: 0.125
+      "M": 0.875,
+      "F": 0.125
     }
     baseStats: {
-      hp: 45,
-      atk: 49,
-      def: 49,
-      spa: 65,
-      spd: 65,
-      spe: 45
+      "hp": 45,
+      "atk": 49,
+      "def": 49,
+      "spa": 65,
+      "spd": 65,
+      "spe": 45,
     }
     abilities: {
       "0": "Overgrow",
-      H: "Chlorophyll"
+      "H": "Chlorophyll"
     }
     heightm: 0.7
     weightkg: 6.9
@@ -42,12 +42,12 @@ class OC:
         print("Registered OC")
 
     finalStats: {
-        hp: 294,
-        atk: 216,
-        def: 216,
-        spa: 251,
-        spd: 251,
-        spe: 207
+        "hp": 294,
+        "atk": 216,
+        "def": 216,
+        "spa": 251,
+        "spd": 251,
+        "spe": 207
     }
 
     def __del__(self):
@@ -69,10 +69,6 @@ class ListOC:
 
     def add(self,OC):
         self.OC.append(OC)
-
-    def view(self):
-        for x in self.OC
-            print(x)
 
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_TOKEN =  os.getenv("GUILD_ID")
@@ -96,24 +92,13 @@ async def on_member_join(member, guild):
 async def on_member_leave(member, guild):
     print(f'{member} has left the server')
 
-@bot.event
-async def on_member_join(member):
-    await member.create_dm()
-    await member.dm_channel.send(
-        f'Hi {member.name}, welcome to my Discord server!'
-    )
-
-@bot.event
-async def on_member_leave(member, guild):
-    print(f'{member} has left the server')
-
 @bot.command()
 async def add(ctx, a: int, b: int):
     await ctx.send(a+b)
 
 @bot.command(pass_context=True)
 async def help(ctx, args=''):
-    author = ctx.message.author
+    print(ctx.message.author)
     embed = discord.Embed(
         colour=discord.Colour.dark_red()
     )
