@@ -10,12 +10,20 @@ FILE_PATH = os.path.join(SCRIPT_DIR, 'database/database.json')
 class Calc:
         
     @staticmethod
-    def hp_stat(num=0):
-        return 204+math.floor(2*num)
+    def hp_stat(_num=0):
+        return 204+math.floor(2*_num)
     
     @staticmethod
-    def stat(num=0):
-        return math.floor(1.1 * math.floor(2*num) + 0.9) + 108
+    def stat(_num=0):
+        return math.floor(1.1 * math.floor(2*_num) + 0.9) + 108
+
+    @staticmethod
+    def attackCalc(_atk, _def, _pwr, _crit):
+        if _crit:
+            _lvl = 25
+        else:
+            _lvl = 50
+        return (_atk * (_lvl + 5) + 250 * _def)/(125 * _def)
 
 with open(FILE_PATH, 'r') as f:
     DISTROS_DICT = json.load(f)
@@ -25,9 +33,9 @@ with open(FILE_PATH, 'r') as f:
 class Character:
     def __init__(self):
         self._name = 'Steve'
-        self._species = ['']
+        self._species = []
         self._gender = ''
-        self._types = ['']
+        self._types = []
         self._age = 0
         self._personality = ''
         self._occupation = ''
@@ -37,50 +45,68 @@ class Character:
         self._weight = 0
         self._strenghts = ''
         self._weaknesses = ''
+        self._abilities = []
         self._sp_ability = ''
+        self._backstory = ''
         self._image = ''
 
     def __str__(self):
-        return """
-        Species: {}
-        Gender: {}
-        Name: {}
-        Type: {}
-        Age: {}
-        Personality: {}
-        Occupation: {}
-        Likes: {}
-        Dislikes: {}
-        -----   -----   -----
-        Height: {}
-        Weight: {}
-        -----   -----   -----
-        Strenghts: {}
-        Weaknesses: {}
-        |----- × ----- × ----- × -----|
-        Ability: {}
-        Special Ability: {}
-        -----   -----   -----
-        Backstory: {}
-        -----   -----   -----Image:-----   -----   -----
-        {}
-        """.format()
+        wrapper = textwrap.TextWrapper(width=50)
+        return(
+            '|----- × ----- × ----- × -----|'
+            +'\nSpecies: {0}'.format(', '.join(self._species))
+            +'\nGender: {}'.format(self._gender)
+            +'\nName: {}'.format(self._name)
+            +'\nType: {}'.format(', '.join(self._types))
+            +'\nAge: {}'.format(self._age)
+            +'\nPersonality: {}'.format(wrapper.fill(self._personality))
+            +'\n\nOccupation: {}'.format(wrapper.fill(self._occupation))
+            +'\n\nLikes: {}'.format(wrapper.fill(self._likes))
+            +'\n\nDislikes: {}'.format(wrapper.fill(self._dislikes))
+            +'\n\n-----   -----   -----'
+            +'\nHeight: {}'.format(self._height)
+            +'\nWeight: {}'.format(self._weight)
+            +'\n-----   -----   -----'
+            +'\nStrenghts: {}'.format(wrapper.fill(self._strenghts))
+            +'\n\nWeaknesses: {}'.format(wrapper.fill(self._weaknesses))
+            +'\n\n|----- × ----- × ----- × -----|'
+            +'\nAbility: {}'.format(', '.join(self._abilities))
+            +'\n\nSpecial Ability: {}'.format(wrapper.fill(self._species))
+            +'\n-----   -----   -----'
+            +'\nBackstory: {}'.format(wrapper.fill(self._backstory))
+            +'\n-----   -----   -----Image:-----   -----   -----'
+            +'\n{}'.format(self._image)
+        )
 
 class Pokemon:
-    def __init__(self):
-        self._name = 'MissingNO'
-        self._hp = 0
-        self._attack = 0
-        self._defense = 0
-        self._sp_attack = 0
-        self._sp_defense = 0
-        self._speed = 0
-        self._abilities = []
-        self._types = []
-        self._height = 0
-        self._weight = 0
+    def __init__(self, name, hp, attack, defense, sp_attack, sp_defense, speed, abilities, types, height, weight):
+        self._name = name
+        self._hp = Calc.hp_stat(hp)
+        self._attack = Calc.stat(attack)
+        self._defense = Calc.stat(defense)
+        self._sp_attack = Calc.stat(sp_attack)
+        self._sp_defense = Calc.stat(sp_defense)
+        self._speed = Calc.stat(speed)
+        self._abilities = abilities
+        self._types = types
+        self._height = int(height)
+        self._weight = int(weight)
+    def __repr__(self):
+        return(
+            '\n-----{}-----'.format(self._name)
+            +'\nHP: {}'.format(self._hp)
+            +'\nATK: {}'.format(self._attack)
+            +'\nDEF: {}'.format(self._defense)
+            +'\nSP. ATK: {}'.format(self._sp_attack)
+            +'\nSP. DEF: {}'.format(self._sp_defense)
+            +'\nSPEED: {}'.format(self._speed)
+            +'\nABILITIES: {}'.format(", ".join(self._abilities))
+            +'\nTYPES: {}'.format(", ".join(self._types))
+            +'\nWEIGHT: {}'.format(self._weight)
+            +'\nHEIGHT: {}'.format(self._height)
+        )
     def __str__(self):
-        return '\t'.join([
+        return '{};{};{};{};{};{};{};{};{};{};{}'.format(
             self._name,
             self._hp,
             self._attack,
@@ -88,64 +114,44 @@ class Pokemon:
             self._sp_attack,
             self._sp_defense,
             self._speed,
-            ', '.join(self._abilities),
-            ', '.join(self._types),
-            self._height,
-            self._weight
-        ])
+            '|'.join(self._abilities),
+            '|'.join(self._types),
+            self._weight,
+            self._height
+        )
 
 class ListPokemon:
     def __init__(self):
         self.ocs = []
-    def add_oc(self):
-        character = Pokemon()
+    def add_oc(self, name):
+        AUX = DISTROS_DICT['Pokemon'][name]
+        character = Pokemon(
+            name,
+            AUX['base stats']['HP'],
+            AUX['base stats']['Attack'],
+            AUX['base stats']['Defense'],
+            AUX['base stats']['Sp. Attack'],
+            AUX['base stats']['Sp. Defense'],
+            AUX['base stats']['Speed'],
+            AUX['abilities'],
+            AUX['types'],
+            AUX['weight'],
+            AUX['height']
+        )
         self.ocs.append(character)
+
     def view_inventory(self):
-        print('\t'.join(['', 'NAME', 'HP', 'ATK', 'DEF', 'SP_ATK', 'SP_DEF', 'SPEED']))
-        for idx, character in enumerate(self.ocs):
-            print(idx + 1, end='\t')
+        for character in self.ocs:
             print(character)
 
 
 LIST = ListPokemon()
 
-# for POKEMON in DISTROS_DICT['Pokemon']:
-    # AUX = DISTROS_DICT['Pokemon'][POKEMON]['base stats']
-    # print("-----{}-----".format(POKEMON))
-    # print("HP: {}".format(Calc.hp_stat(AUX['HP'])))
-    # print("ATK: {}".format(Calc.stat(AUX['Attack'])))
-    # print("DEF: {}".format(Calc.stat(AUX['Defense'])))
-    # print("SP. ATK: {}".format(Calc.stat(AUX['Sp. Attack'])))
-    # print("SP. DEF: {}".format(Calc.stat(AUX['Sp. Defense'])))
-    # print("SPEED: {}".format(Calc.stat(AUX['Speed'])))
-    # print("ABILITIES: {}".format(", ".join(DISTROS_DICT['Pokemon'][POKEMON]['abilities'])))
-    # print("TYPES: {}".format(", ".join(DISTROS_DICT['Pokemon'][POKEMON]['types'])))
-    # print("WEIGHT: {}".format(int(DISTROS_DICT['Pokemon'][POKEMON]['weight'])))
-    # print("HEIGHT: {}".format(int(DISTROS_DICT['Pokemon'][POKEMON]['height'])))
+for POKEMON in DISTROS_DICT['Pokemon']:
+    LIST.add_oc(POKEMON)
 
-# print(json.dumps(DISTROS_DICT, indent=4, sort_keys=True))
+file = open('data.csv','w')
+for OC in LIST.ocs:
+    file.write(str(OC)+'\n')
 
-print("""Species: {}
-        \nGender: {}
-        Name: {}
-        Type: {}
-        Age: {}
-        Personality: {}
-        Occupation: {}
-        Likes: {}
-        Dislikes: {}
-        -----   -----   -----
-        Height: {}
-        Weight: {}
-        -----   -----   -----
-        Strenghts: {}
-        Weaknesses: {}
-        |----- × ----- × ----- × -----|
-        Ability: {}
-        Special Ability: {}
-        -----   -----   -----
-        Backstory: {}
-        -----   -----   -----Image:-----   -----   -----
-        {}
-        """.format(range(17))
-    )
+file.close
