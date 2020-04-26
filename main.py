@@ -17,6 +17,8 @@ async def on_ready():
     print(BOT.user.name)
     print(BOT.user.id)
     print('------')
+    activity = discord.Game(name="$help 1")
+    await BOT.change_presence(status=discord.Status.online, activity=activity)
 
 
 @BOT.event
