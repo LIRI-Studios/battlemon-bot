@@ -10,20 +10,20 @@ FILE_PATH = os.path.join(SCRIPT_DIR, 'database/database.json')
 class Calc:
         
     @staticmethod
-    def hp_stat(_num=0):
-        return 204+math.floor(2*_num)
+    def hp_stat(_base, _lvl=100, _ivs=31, _evs=252):
+        # return 204+math.floor(2*_num)
+        return 10 + math.floor( _lvl * (_base/50 + _evs/400 + _ivs/100 + 1) )
     
     @staticmethod
-    def stat(_num=0):
-        return math.floor(1.1 * math.floor(2*_num) + 0.9) + 108
+    def stat(_base, _lvl=100, _ivs=31, _evs=252, _nat=1.1):
+        # return math.floor(1.1 * math.floor(2*_base) + 0.9) + 108
+        return math.floor(_nat * (5 + math.floor( _lvl * (_base/50 + _evs/400 + _ivs/100 + 1) )))
 
     @staticmethod
-    def attackCalc(_atk, _def, _pwr, _crit):
+    def attackCalc(_atk, _def, _pwr, _lvl=100, _crit=False, _mul=1):
         if _crit:
-            _lvl = 25
-        else:
-            _lvl = 50
-        return (_atk * (_lvl + 5) + 250 * _def)/(125 * _def)
+            _lvl = _lvl*2
+        return math.floor( (2 + (_atk * _lvl * _pwr)/(125 * _def) + (_atk * _pwr)/(25 * _def) ) * _mul)
 
 with open(FILE_PATH, 'r') as f:
     DISTROS_DICT = json.load(f)
@@ -144,14 +144,35 @@ class ListPokemon:
         for character in self.ocs:
             print(character)
 
+A = DISTROS_DICT['Pokemon']['axew']['base stats']
+LA = 5
+HP = Calc.hp_stat(A['HP'], LA)
+ATK = Calc.stat(A['Attack'], LA)
+DEF = Calc.stat(A['Defense'], LA)
 
-LIST = ListPokemon()
+B = DISTROS_DICT['Pokemon']['delphox']['base stats']
+LB = 100
+HP2 = Calc.hp_stat(B['HP'], LB)
+ATK2 = Calc.stat(B['Attack'], LB)
+DEF2 = Calc.stat(B['Defense'], LB)
 
-for POKEMON in DISTROS_DICT['Pokemon']:
-    LIST.add_oc(POKEMON)
+print(ATK)
+print(DEF)
+print(ATK2)
+print(DEF2)
 
-file = open('data.csv','w')
-for OC in LIST.ocs:
-    file.write(str(OC)+'\n')
+print('HP: {}'.format(HP))
+print('HP-: {}'.format(Calc.attackCalc(ATK2, DEF, 40, LB, False, 1.3*2)))
+print('HP: {}'.format(HP2))
+print('HP-: {}'.format(Calc.attackCalc(ATK, DEF2, 40, LA, False, 0.5*1.3)))
 
-file.close
+#LIST = ListPokemon()
+
+#for POKEMON in DISTROS_DICT['Pokemon']:
+    #LIST.add_oc(POKEMON)
+
+#file = open('data.csv','w')
+#for OC in LIST.ocs:
+#    file.write(str(OC)+'\n')
+
+#file.close
