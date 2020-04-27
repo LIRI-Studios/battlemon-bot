@@ -20,7 +20,7 @@ class Calc:
         return math.floor(_nat * (5 + math.floor( _lvl * (_base/50 + _evs/400 + _ivs/100 + 1) )))
 
     @staticmethod
-    def attackCalc(_atk, _def, _pwr, _lvl=100, _crit=False, _mul=1):
+    def attackCalc(_atk, _def, _pwr, _lvl=100, _mul=1, _crit=False):
         if _crit:
             _lvl = _lvl*2
         return math.floor( (2 + (_atk * _lvl * _pwr)/(125 * _def) + (_atk * _pwr)/(25 * _def) ) * _mul)
@@ -162,9 +162,9 @@ print(ATK2)
 print(DEF2)
 
 print('HP: {}'.format(HP))
-print('HP-: {}'.format(Calc.attackCalc(ATK2, DEF, 40, LB, False, 1.3*2)))
+print('HP-: {}'.format(Calc.attackCalc(ATK2, DEF, 40, LB, 1.3*2)))
 print('HP: {}'.format(HP2))
-print('HP-: {}'.format(Calc.attackCalc(ATK, DEF2, 40, LA, False, 0.5*1.3)))
+print('HP-: {}'.format(Calc.attackCalc(ATK, DEF2, 40, LA)))
 
 #LIST = ListPokemon()
 
