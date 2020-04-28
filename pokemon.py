@@ -1,23 +1,21 @@
 import math
-import json
-import os
 import textwrap
-import csv
+import os
+import json
 
 SCRIPT_DIR = os.path.dirname(__file__)
 FILE_PATH = os.path.join(SCRIPT_DIR, 'database/database.json')
 
+with open(FILE_PATH, 'r') as f:
+    DISTROS_DICT = json.load(f)
 
-class Methods:
-    @staticmethod
-    def index_2d(_data, _search):
-        for i, value in enumerate(_data):
-            try:
-                return i, value.index(_search)
-            except ValueError:
-                pass
-        raise ValueError("{} is not in list".format(repr(_search)))
-
+def index_2d(_data, _search):
+    for i, value in enumerate(_data):
+        try:
+            return i, value.index(_search)
+        except ValueError:
+            pass
+    raise ValueError("{} is not in list".format(repr(_search)))
 
 class Calc:
     @staticmethod
@@ -29,10 +27,10 @@ class Calc:
         return math.floor(_nat * (5 + math.floor(_lvl * (_base/50 + _evs/400 + _ivs/100 + 1))))
 
     @staticmethod
-    def attackCalc(_atk, _def, _pwr, _lvl=100, _mul=1, _crit=False):
+    def attack_calc(_atk, _def, _pwr, _lvl=100, _mul=1, _crit=False):
         if _crit:
             _lvl *= 2
-        return math.floor((2 + (_atk * _lvl * _pwr)/(125 * _def) + (_atk * _pwr)/(25 * _def)) * _mul)
+        return math.floor((2 + (_atk * _lvl * _pwr)/(125 * _def) + (_atk * _pwr)/(25 * _def)) * _mul )
 
     @staticmethod
     def nature(_name):
@@ -44,14 +42,10 @@ class Calc:
             ['Calm', 'Gentle', 'Careful', 'Quirky', 'Sassy'],
             ['Timid', 'Hasty', 'Jolly', 'Naive', 'Serious'],
         ]
-        coords = Methods.index_2d(natures, _name)
+        coords = index_2d(natures, _name)
         result[coords[0]] -= 0.1
         result[coords[1]] += 0.1
         return result
-
-
-with open(FILE_PATH, 'r') as f:
-    DISTROS_DICT = json.load(f)
 
 
 class Character:
@@ -111,24 +105,17 @@ class Pokemon:
             _evs = [252]*6
         if _nature is None:
             _nature = [1.1]*5
-        data = DISTROS_DICT['Pokemon'][_name]
         self._name = _name
-        self._hp = Calc.hp_stat(
-            data['base stats']['HP'], _lvl, _ivs[0], _evs[0])
-        self._attack = Calc.stat(
-            data['base stats']['Attack'], _lvl, _ivs[1], _evs[1], _nature[0])
-        self._defense = Calc.stat(
-            data['base stats']['Defense'], _lvl, _ivs[2], _evs[2], _nature[1])
-        self._sp_attack = Calc.stat(
-            data['base stats']['Sp. Attack'], _lvl, _ivs[3], _evs[3], _nature[2])
-        self._sp_defense = Calc.stat(
-            data['base stats']['Sp. Defense'], _lvl, _ivs[4], _evs[4], _nature[3])
-        self._speed = Calc.stat(
-            data['base stats']['Speed'], _lvl, _ivs[5], _evs[5], _nature[4])
-        self._abilities = data['abilities']
-        self._types = data['types']
-        self._height = int(data['height'])
-        self._weight = int(data['weight'])
+        self._hp = Calc.hp_stat(DISTROS_DICT['Pokemon'][_name]['base stats']['HP'], _lvl, _ivs[0], _evs[0])
+        self._attack = Calc.stat(DISTROS_DICT['Pokemon'][_name]['base stats']['Attack'], _lvl, _ivs[1], _evs[1], _nature[0])
+        self._defense = Calc.stat(DISTROS_DICT['Pokemon'][_name]['base stats']['Defense'], _lvl, _ivs[2], _evs[2], _nature[1])
+        self._sp_attack = Calc.stat(DISTROS_DICT['Pokemon'][_name]['base stats']['Sp. Attack'], _lvl, _ivs[3], _evs[3], _nature[2])
+        self._sp_defense = Calc.stat(DISTROS_DICT['Pokemon'][_name]['base stats']['Sp. Defense'], _lvl, _ivs[4], _evs[4], _nature[3])
+        self._speed = Calc.stat(DISTROS_DICT['Pokemon'][_name]['base stats']['Speed'], _lvl, _ivs[5], _evs[5], _nature[4])
+        self._abilities = DISTROS_DICT['Pokemon'][_name]['abilities']
+        self._types = DISTROS_DICT['Pokemon'][_name]['types']
+        self._height = int(DISTROS_DICT['Pokemon'][_name]['height'])
+        self._weight = int(DISTROS_DICT['Pokemon'][_name]['weight'])
 
     def __repr__(self):
         return(
@@ -173,29 +160,3 @@ class ListPokemon:
         for character in self.ocs:
             print(character)
 
-
-csv_file = csv.reader(open('data.csv', 'r'), delimiter=';')
-
-# for data in csv_file:
-# if data[0] == 'delphox':
-# HP = int(data[1])
-# ATK = int(data[2])
-# DEF = int(data[3])
-# # # SATK = int(data[4])
-# SDEF = int(data[5])
-# if data[0] == 'sylveon':
-# HP2 = int(data[1])
-# ATK2 = int(data[2])
-# DEF2 = int(data[3])
-# SATK2 = int(data[4])
-# SDEF2 = int(data[5])
-
-LIST = ListPokemon()
-for POKEMON in DISTROS_DICT['Pokemon']:
-    LIST.add_oc(POKEMON)
-
-file = open('data.csv', 'w')
-for OC in LIST.ocs:
-    file.write(str(OC)+'\n')
-
-file.close

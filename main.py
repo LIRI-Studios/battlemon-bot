@@ -1,20 +1,30 @@
 # settings.py
 import os
+import json
+import settings
 import discord
 from discord.ext import commands
-import settings
 
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_TOKEN = os.getenv("GUILD_ID")
+SCRIPT_DIR = os.path.dirname(__file__)
+FILE_PATH = os.path.join(SCRIPT_DIR, 'database/users.json')
+
+with open(FILE_PATH, 'r') as f:
+    DISTROS_DICT = json.load(f)
 
 BOT = commands.Bot(command_prefix='$',
                    description='A bot that greets the user back.')
 BOT.remove_command('help')
 
+def write_json(data, filename=FILE_PATH): 
+    with open(filename,'w') as json_file: 
+        json.dump(data, json_file, indent=4) 
+
+
 @BOT.event
 async def on_ready():
     print('Logged in as')
-    print(BOT.user.name)
     print(BOT.user.id)
     print('------')
     activity = discord.Game(name="$help 1")
@@ -33,7 +43,73 @@ async def on_member_leave(member, guild):
 
 
 @BOT.command()
+async def select(ctx, args=''):
+    if ctx.message.guild.id in DISTROS_DICT:
+        if ctx.message.author.id in DISTROS_DICT[ctx.message.guild.id]:
+            if args in DISTROS_DICT[ctx.message.guild.id][ctx.message.guild.id]['OCs']:
+                with open(FILE_PATH) as json_file:
+                    data = json.load(json_file)
+                    data['{}'.format(ctx.message.guild.id)]['{}'.format(ctx.message.author.id)] = args
+                write_json(data)
+                await ctx.send('Character |{}| is Selected'.format(args))
+            else:
+                await ctx.send('Character |{}| isn\'t registered'.format(args))
+        else: # User not registered
+            await ctx.send('Try registering an OC. Use {}register {}'.format(BOT.command_prefix, args))
+    else: # Guild not registered
+        await ctx.send('Try registering an OC. Use {}register {}'.format(BOT.command_prefix, args))
+
+@BOT.command()
+async def register(ctx, args=''):
+    with open(FILE_PATH) as json_file:
+        data = json.load(json_file)
+        temp = data['Servers']
+        Flag1 = True
+        for server in temp:
+            if server['ID'] == ctx.message.guild.id:
+                Flag1 = False
+                Flag2 = True
+                for user in server['Users']:
+                    if user['ID'] == ctx.message.user.id:
+                        Flag2 = False
+                        Flag3 = True
+                        for oc in user['OCS']:
+                            if oc['Name'] == args:
+                                Flag3 = False
+                                await ctx.send('Character |{}| is registered already'.format(args))
+                                return
+                        if Flag3:
+                            user['OCS'].append({"Name": args})
+                            await ctx.send('Character |{}| was registered'.format(args))
+                            return
+                if Flag2:
+                    server['Users'].append(
+                        {
+                            "ID":ctx.message.user.id,
+                            "Selected":0,
+                            "OCS":[{"Name": args}]
+                        }
+                    )
+        if Flag1:
+            temp.append(
+                {
+                    "ID": ctx.message.guild.id,
+                    "Users":[
+                        {
+                            "ID":ctx.message.user.id,
+                            "Selected":0,
+                            "OCS":[{"Name": args}]
+                        }
+                    ]
+                }
+            )
+    write_json(data)
+
+    await ctx.send('Character |{}| is registered already'.format(args))
+
+@BOT.command()
 async def add(ctx, a: int, b: int):
+    print(ctx.message.id)
     await ctx.send(a+b)
 
 
