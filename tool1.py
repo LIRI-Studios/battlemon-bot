@@ -3,7 +3,6 @@ import json
 import os
 import textwrap
 import csv
-import sys
 
 SCRIPT_DIR = os.path.dirname(__file__)
 FILE_PATH = os.path.join(SCRIPT_DIR, 'database/database.json')
@@ -12,9 +11,9 @@ FILE_PATH = os.path.join(SCRIPT_DIR, 'database/database.json')
 class Methods:
     @staticmethod
     def index_2d(_data, _search):
-        for i, e in enumerate(_data):
+        for i, value in enumerate(_data):
             try:
-                return i, e.index(_search)
+                return i, value.index(_search)
             except ValueError:
                 pass
         raise ValueError("{} is not in list".format(repr(_search)))
@@ -23,12 +22,10 @@ class Methods:
 class Calc:
     @staticmethod
     def hp_stat(_base, _lvl=100, _ivs=31, _evs=252):
-        # return 204+math.floor(2*_num)
         return 10 + math.floor(_lvl * (_base/50 + _evs/400 + _ivs/100 + 1))
 
     @staticmethod
     def stat(_base, _lvl=100, _ivs=31, _evs=252, _nat=1.1):
-        # return math.floor(1.1 * math.floor(2*_base) + 0.9) + 108
         return math.floor(_nat * (5 + math.floor(_lvl * (_base/50 + _evs/400 + _ivs/100 + 1))))
 
     @staticmethod
@@ -81,26 +78,26 @@ class Character:
         wrapper = textwrap.TextWrapper(width=50)
         return(
             '|----- × ----- × ----- × -----|'
-            + '\nSpecies: {0}'.format(', '.join(self._species))
-            + '\nGender: {}'.format(self._gender)
-            + '\nName: {}'.format(self._name)
-            + '\nType: {}'.format(', '.join(self._types))
-            + '\nAge: {}'.format(self._age)
-            + '\nPersonality: {}'.format(wrapper.fill(self._personality))
-            + '\n\nOccupation: {}'.format(wrapper.fill(self._occupation))
-            + '\n\nLikes: {}'.format(wrapper.fill(self._likes))
-            + '\n\nDislikes: {}'.format(wrapper.fill(self._dislikes))
-            + '\n\n-----   -----   -----'
-            + '\nHeight: {}'.format(self._height)
-            + '\nWeight: {}'.format(self._weight)
+            + '\n**Species:** {0}'.format(', '.join(self._species))
+            + '\n**Gender:** {}'.format(self._gender)
+            + '\n**Name:** {}'.format(self._name)
+            + '\n**Type:** {}'.format(', '.join(self._types))
+            + '\n**Age:** {}'.format(self._age)
+            + '\n**Personality:** {}'.format(wrapper.fill(self._personality))
+            + '\n\n**Occupation:** {}'.format(wrapper.fill(self._occupation))
+            + '\n\n**Likes:** {}'.format(wrapper.fill(self._likes))
+            + '\n\n**Dislikes:** {}'.format(wrapper.fill(self._dislikes))
+            + '\n\n**-----   -----   -----'
+            + '\n**Height:** {}'.format(self._height)
+            + '\n**Weight:** {}'.format(self._weight)
             + '\n-----   -----   -----'
-            + '\nStrenghts: {}'.format(wrapper.fill(self._strenghts))
-            + '\n\nWeaknesses: {}'.format(wrapper.fill(self._weaknesses))
+            + '\n**Strenghts:** {}'.format(wrapper.fill(self._strenghts))
+            + '\n\n**Weaknesses:** {}'.format(wrapper.fill(self._weaknesses))
             + '\n\n|----- × ----- × ----- × -----|'
-            + '\nAbility: {}'.format(', '.join(self._abilities))
-            + '\n\nSpecial Ability: {}'.format(wrapper.fill(self._species))
+            + '\n**Ability:** {}'.format(', '.join(self._abilities))
+            + '\n\n**Special Ability:** {}'.format(wrapper.fill(self._species))
             + '\n-----   -----   -----'
-            + '\nBackstory: {}'.format(wrapper.fill(self._backstory))
+            + '\n**Backstory:** {}'.format(wrapper.fill(self._backstory))
             + '\n-----   -----   -----Image:-----   -----   -----'
             + '\n{}'.format(self._image)
         )
@@ -179,19 +176,6 @@ class ListPokemon:
 
 csv_file = csv.reader(open('data.csv', 'r'), delimiter=';')
 
-DISTROS_DICT2 = DISTROS_DICT['Pokemon']['delphox']['base stats']
-HP = Calc.hp_stat(DISTROS_DICT2['HP'])
-ATK = Calc.stat(DISTROS_DICT2['Attack'])
-DEF = Calc.stat(DISTROS_DICT2['Defense'])
-SATK = Calc.stat(DISTROS_DICT2['Sp. Attack'])
-SDEF = Calc.stat(DISTROS_DICT2['Sp. Defense'])
-DISTROS_DICT1 = DISTROS_DICT['Pokemon']['kommo-o']['base stats']
-HP2 = Calc.stat(DISTROS_DICT1['HP'])
-ATK2 = Calc.stat(DISTROS_DICT1['Attack'])
-DEF2 = Calc.stat(DISTROS_DICT1['Defense'])
-SATK2 = Calc.stat(DISTROS_DICT1['Sp. Attack'])
-SDEF2 = Calc.stat(DISTROS_DICT1['Sp. Defense'])
-
 # for data in csv_file:
 # if data[0] == 'delphox':
 # HP = int(data[1])
@@ -205,16 +189,6 @@ SDEF2 = Calc.stat(DISTROS_DICT1['Sp. Defense'])
 # DEF2 = int(data[3])
 # SATK2 = int(data[4])
 # SDEF2 = int(data[5])
-
-print(HP)
-print(ATK)
-print(DEF)
-print(HP2)
-print(ATK2)
-print(DEF2)
-
-print('HP: {}'.format(HP2))
-print('HP-: {}'.format(Calc.attackCalc(SATK, SDEF2, 80, 100, 4)))
 
 LIST = ListPokemon()
 for POKEMON in DISTROS_DICT['Pokemon']:
