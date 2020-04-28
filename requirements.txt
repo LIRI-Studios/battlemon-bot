@@ -4,3 +4,4 @@ pylint
 autopep8
 rope
 git+https://github.com/slice/clyde@master#egg=clyde
+tinydb
