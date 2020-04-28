@@ -105,30 +105,30 @@ class Character:
 
 class Pokemon:
     def __init__(self, _name, _lvl=100, _ivs=None, _evs=None, _nature=None):
-        if _ivs == None:
+        if _ivs is None:
             _ivs = [31]*6
-        if _evs == None:
+        if _evs is None:
             _evs = [252]*6
-        if _nature == None:
+        if _nature is None:
             _nature = [1.1]*5
-        AUX = DISTROS_DICT['Pokemon'][_name]
+        data = DISTROS_DICT['Pokemon'][_name]
         self._name = _name
         self._hp = Calc.hp_stat(
-            AUX['base stats']['HP'], _lvl, _ivs[0], _evs[0])
+            data['base stats']['HP'], _lvl, _ivs[0], _evs[0])
         self._attack = Calc.stat(
-            AUX['base stats']['Attack'], _lvl, _ivs[1], _evs[1], _nature[0])
+            data['base stats']['Attack'], _lvl, _ivs[1], _evs[1], _nature[0])
         self._defense = Calc.stat(
-            AUX['base stats']['Defense'], _lvl, _ivs[2], _evs[2], _nature[1])
+            data['base stats']['Defense'], _lvl, _ivs[2], _evs[2], _nature[1])
         self._sp_attack = Calc.stat(
-            AUX['base stats']['Sp. Attack'], _lvl, _ivs[3], _evs[3], _nature[2])
+            data['base stats']['Sp. Attack'], _lvl, _ivs[3], _evs[3], _nature[2])
         self._sp_defense = Calc.stat(
-            AUX['base stats']['Sp. Defense'], _lvl, _ivs[4], _evs[4], _nature[3])
+            data['base stats']['Sp. Defense'], _lvl, _ivs[4], _evs[4], _nature[3])
         self._speed = Calc.stat(
-            AUX['base stats']['Speed'], _lvl, _ivs[5], _evs[5], _nature[4])
-        self._abilities = AUX['abilities']
-        self._types = AUX['types']
-        self._height = int(AUX['height'])
-        self._weight = int(AUX['weight'])
+            data['base stats']['Speed'], _lvl, _ivs[5], _evs[5], _nature[4])
+        self._abilities = data['abilities']
+        self._types = data['types']
+        self._height = int(data['height'])
+        self._weight = int(data['weight'])
 
     def __repr__(self):
         return(
