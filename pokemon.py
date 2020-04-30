@@ -15,23 +15,59 @@ def index_2d(_data, _search):
             return i, value.index(_search)
         except ValueError:
             pass
-    raise ValueError("{} is not in list".format(repr(_search)))
+    raise ValueError('{} is not in list'.format(repr(_search)))
 
 class Calc:
     @staticmethod
     def hp_stat(_base, _lvl=100, _ivs=31, _evs=252):
+        print('HP: {}'.format(10 + math.floor(_lvl * (_base/50 + _evs/400 + _ivs/100 + 1))))
         return 10 + math.floor(_lvl * (_base/50 + _evs/400 + _ivs/100 + 1))
 
     @staticmethod
     def stat(_base, _lvl=100, _ivs=31, _evs=252, _nat=1.1):
+        print('STAT: {}'.format(math.floor(_nat * (5 + math.floor(_lvl * (_base/50 + _evs/400 + _ivs/100 + 1))))))
         return math.floor(_nat * (5 + math.floor(_lvl * (_base/50 + _evs/400 + _ivs/100 + 1))))
 
     @staticmethod
     def attack_calc(_atk, _def, _pwr, _lvl=100, _mul=1, _crit=False):
         if _crit:
             _lvl *= 2
-        return math.floor((2 + (_atk * _lvl * _pwr)/(125 * _def) + (_atk * _pwr)/(25 * _def)) * _mul )
+        return math.floor(_mul * (math.floor(math.floor(math.floor(2 * _lvl / 5 + 2) * _pwr * _atk / _def) / 50) + 2))
 
+    @staticmethod
+    def type_effectiveness(_attack=[], _name='typeless', _defense=[], Immune=False):
+        result = 1
+        types = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy', 'typeless']
+        chart = [
+            [1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0.5,	0,	1,	1,	0.5,	1],
+            [1,	0.5,	0.5,	1,	2,	2,	1,	1,	1,	1,	1,	2,	0.5,	1,	0.5,	1,	2,	1],
+            [1,	2,	0.5,	1,	0.5,	1,	1,	1,	2,	1,	1,	1,	2,	1,	0.5,	1,	1,	1],
+            [1,	1,	2,	0.5,	0.5,	1,	1,	1,	0,	2,	1,	1,	1,	1,	0.5,	1,	1,	1],
+            [1,	0.5,	2,	1,	0.5,	1,	1,	0.5,	2,	0.5,	1,	0.5,	2,	1,	0.5,	1,	0.5,	1],
+            [1,	0.5,	0.5,	1,	2,	0.5,	1,	1,	2,	2,	1,	1,	1,	1,	2,	1,	0.5,	1],
+            [2,	1,	1,	1,	1,	2,	1,	0.5,	1,	0.5,	0.5,	0.5,	2,	0,	1,	2,	2,	0.5],
+            [1,  1,	1,	1,	2,	1,	1,	0.5,	0.5,	1,	1,	1,	0.5,	0.5,	1,	1,	0,	2],
+            [1,	2,	1,	2,	0.5,	1,	1,	2,	1,	0,	1,	0.5,	2,	1,	1,	1,	2,	1],
+            [1,	1,	1,	0.5,	2,	1,	2,	1,	1,	1,	1,	2,	0.5,	1,	1,	1,	0.5,	1],
+            [1,	1,	1,	1,	1,	1,	2,	2,	1,	1,	0.5,	1,	1,	1,	1,	0,	0.5,	1],
+            [1,	0.5,	1,	1,	2,	1,	0.5,	0.5,	1,	0.5,	2,	1,	1,	0.5,	1,	2,	0.5,	0.5],
+            [1,	2,	1,	1,	1,	2,	0.5,	1,	0.5,	2,	1,	2,	1,	1,	1,	1,	0.5,	1],
+            [0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	2,	1,	1,	2,	1,	0.5,	1,	1],
+            [1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	2,	1,	0.5,	0],
+            [1,	1,	1,	1,	1,	1,	0.5,	1,	1,	1,	2,	1,	1,	2,	1,	0.5,	1,	0.5],
+            [1,	0.5,	0.5,	0.5,	1,	2,	1,	1,	1,	1,	1,	1,	2,	1,	1,	1,	0.5,	2],
+            [1,	0.5,	1,	1,	1,	1,	2,	0.5,	1,	1,	1,	1,	1,	1,	2,	2,	0.5,	1],
+            [1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1]
+        ]
+        for _type in _defense:
+            if _name in types and _type in types:
+                val = chart[types.index(_name)][types.index(_type)]
+                if val == 0:
+                    Immune = True
+                    val = 1
+                result *= val * 1.5 if _name in _attack else 1
+        return result
+    
     @staticmethod
     def nature(_name):
         result = [1, 1, 1, 1, 1]
@@ -126,8 +162,8 @@ class Pokemon:
             + '\nSP. ATK: {}'.format(self._sp_attack)
             + '\nSP. DEF: {}'.format(self._sp_defense)
             + '\nSPEED: {}'.format(self._speed)
-            + '\nABILITIES: {}'.format(", ".join(self._abilities))
-            + '\nTYPES: {}'.format(", ".join(self._types))
+            + '\nABILITIES: {}'.format(', '.join(self._abilities))
+            + '\nTYPES: {}'.format(', '.join(self._types))
             + '\nWEIGHT: {}'.format(self._weight)
             + '\nHEIGHT: {}'.format(self._height)
         )
@@ -160,3 +196,4 @@ class ListPokemon:
         for character in self.ocs:
             print(character)
 
+print('9' in 'o0o90')
