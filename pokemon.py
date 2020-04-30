@@ -2,6 +2,7 @@ import math
 import textwrap
 import os
 import json
+import pokebase as pb
 
 SCRIPT_DIR = os.path.dirname(__file__)
 FILE_PATH = os.path.join(SCRIPT_DIR, 'database/database.json')
@@ -35,7 +36,7 @@ class Calc:
         return math.floor(_mul * (math.floor(math.floor(math.floor(2 * _lvl / 5 + 2) * _pwr * _atk / _def) / 50) + 2))
 
     @staticmethod
-    def type_effectiveness(_attack=[], _name='typeless', _defense=[], Immune=False):
+    def type_effectiveness(_attack=[], _name='typeless', _defense=[]):
         result = 1
         types = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy', 'typeless']
         chart = [
@@ -62,9 +63,6 @@ class Calc:
         for _type in _defense:
             if _name in types and _type in types:
                 val = chart[types.index(_name)][types.index(_type)]
-                if val == 0:
-                    Immune = True
-                    val = 1
                 result *= val * 1.5 if _name in _attack else 1
         return result
     
@@ -195,5 +193,3 @@ class ListPokemon:
     def view_inventory(self):
         for character in self.ocs:
             print(character)
-
-print('9' in 'o0o90')

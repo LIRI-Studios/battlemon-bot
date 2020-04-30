@@ -1,17 +1,15 @@
 # settings.py
 import os
-import json
 import settings
 import pokemon
 import discord
+import pokebase as pb
 from discord.ext import commands
 from tinydb import TinyDB, Query
 from random import randint, random
 
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_TOKEN = os.getenv("GUILD_ID")
-SCRIPT_DIR = os.path.dirname(__file__)
-FILE_PATH = os.path.join(SCRIPT_DIR, 'database/users.json')
 
 BOT = commands.Bot(command_prefix='$',description='Bot that handles pokemon combat.')
 BOT.remove_command('help')
@@ -40,7 +38,7 @@ def acc_value(acc):
         return 'Can\'t miss.'
     acc = int(acc)
     num = random()*100
-    for i in range(9, 2 , -1):
+    for i in range(9, 2, -1):
         if 3*acc/i >= num:
             return 'It hits. Dodgeable at +{}'.format(i-2)
     return 'It misses.' # Dodgeable at +0
@@ -55,71 +53,84 @@ def crit_value():
     return 'Not critical Hit.'
 
 @BOT.command(pass_context=True)
-async def HP(ctx, Mon):
-    ctx.send('{} has {} HP'.format(Mon, pokemon.Calc.hp_stat(pokemon.DISTROS_DICT['Pokemon'][Mon.lower()]['base stats']['HP'])))
-
-@BOT.command(pass_context=True)
 async def stats(ctx, Mon, Lvl=100):
+    Aux1 = pb.pokemon(Mon)
     embed = discord.Embed(colour=discord.Colour.dark_red())
-    embed.add_field(name='HP', value='{}'.format(pokemon.Calc.hp_stat(pokemon.DISTROS_DICT['Pokemon'][Mon.lower()]['base stats']['HP'], Lvl)),inline=False)
-    embed.add_field(name='Attack', value='{}'.format(pokemon.Calc.stat(pokemon.DISTROS_DICT['Pokemon'][Mon.lower()]['base stats']['Attack'], Lvl)),inline=False)
-    embed.add_field(name='Defense', value='{}'.format(pokemon.Calc.stat(pokemon.DISTROS_DICT['Pokemon'][Mon.lower()]['base stats']['Defense'], Lvl)),inline=False)
-    embed.add_field(name='Sp. Attack', value='{}'.format(pokemon.Calc.stat(pokemon.DISTROS_DICT['Pokemon'][Mon.lower()]['base stats']['Sp. Attack'], Lvl)),inline=False)
-    embed.add_field(name='Sp. Defense', value='{}'.format(pokemon.Calc.stat(pokemon.DISTROS_DICT['Pokemon'][Mon.lower()]['base stats']['Sp. Defense'], Lvl)),inline=False)
-    embed.add_field(name='Speed', value='{}'.format(pokemon.Calc.stat(pokemon.DISTROS_DICT['Pokemon'][Mon.lower()]['base stats']['Speed'], Lvl)),inline=False)
+    embed.add_field(name='HP', value='{}'.format(pokemon.Calc.hp_stat(Aux1.stats[5].base_stat, Lvl)))
+    embed.add_field(name='Attack', value='{}'.format(pokemon.Calc.stat(Aux1.stats[4].base_stat, Lvl)))
+    embed.add_field(name='Defense', value='{}'.format(pokemon.Calc.stat(Aux1.stats[3].base_stat, Lvl)))
+    embed.add_field(name='Sp. Attack', value='{}'.format(pokemon.Calc.stat(Aux1.stats[2].base_stat, Lvl)))
+    embed.add_field(name='Sp. Defense', value='{}'.format(pokemon.Calc.stat(Aux1.stats[1].base_stat, Lvl)))
+    embed.add_field(name='Speed', value='{}'.format(pokemon.Calc.stat(Aux1.stats[0].base_stat, Lvl)))
     embed.set_footer(text='{} | Max IVs | Favourable Nature'.format(Mon))
     await ctx.send(embed=embed)
 
 @BOT.command(pass_context=True)
 async def battle(ctx, MonA: str, MonB: str, Move: str, Multiplier=1.0, Level1=100, Level2=100):
-    FILE_PATH = os.path.join(SCRIPT_DIR, 'database/database.json')
-    with open(FILE_PATH, 'r') as f:
-        DISTROS_DICT = json.load(f)
-    Aux1 = pokemon.DISTROS_DICT['Pokemon'][MonA.lower()]
-    Aux2 = pokemon.DISTROS_DICT['Pokemon'][MonB.lower()]
-    Aux3 = pokemon.DISTROS_DICT['Moves'][Move.lower()]
-    HP = pokemon.Calc.hp_stat(Aux2['base stats']['HP'], Level2)
+    Aux1 = pb.pokemon(MonA)
+    Aux2 = pb.pokemon(MonB)
+    Aux3 = pb.move(Move)
+    types1 = []
+    types2 = []
+    for item in Aux1.types:
+        types1.append(item.type.name)
+    for item in Aux2.types:
+        types2.append(item.type.name)
+    HP = pokemon.Calc.hp_stat(Aux2.stats[5].base_stat, Level2)
     Immune = False
-    Multiplier *= pokemon.Calc.type_effectiveness(Aux3['type'], Aux2['types'], Immune)
-    if Aux3['category'] == 'special':
-        ATK = pokemon.Calc.stat(Aux1['base stats']['Sp. Attack'], Level1)
+    Multiplier *= pokemon.Calc.type_effectiveness(types1, Aux3.type.name, types2)
+    if Aux3.damage_class.name == 'special':
+        ATK = pokemon.Calc.stat(Aux1.stats[2].base_stat, Level1)
         if Move.lower() in ['psyshock', 'psystrike', 'secret-sword']:
-            DEF = pokemon.Calc.stat(Aux2['base stats']['Defense'], Level2)
+            DEF = pokemon.Calc.stat(Aux2.stats[3].base_stat, Level2)
         else:
-            DEF = pokemon.Calc.stat(Aux2['base stats']['Sp. Defense'], Level2)
-    if Aux3['category'] == 'physical':
-        ATK = pokemon.Calc.stat(Aux1['base stats']['Attack'], Level1)
-        DEF = pokemon.Calc.stat(Aux2['base stats']['Defense'], Level2)
+            DEF = pokemon.Calc.stat(Aux2.stats[1].base_stat, Level2)
+    if Aux3.damage_class.name == 'physical':
+        ATK = pokemon.Calc.stat(Aux1.stats[4].base_stat, Level1)
+        DEF = pokemon.Calc.stat(Aux2.stats[3].base_stat, Level2)
 
-    Min = int(Aux3['min hits']) if Aux3['min hits'] != "None" else 1
-    Max = int(Aux3['max hits']) if Aux3['min hits'] != "None" else 1
+    Min = Aux3.meta.min_hits if Aux3.meta.min_hits is not None else 1
+    Max = Aux3.meta.max_hits if Aux3.meta.min_hits is not None else 1
     for i in range(randint(Min, Max)):
         RandomValue = randint(85, 100)/100
         embed = discord.Embed(colour=discord.Colour.dark_red())
         embed.set_author(name=Move.lower())
-        embed.add_field(name='{}: {}'.format(Move.lower(), i),value='{}'.format(Aux3['description']).replace('$effect_chance%', '{}%'.format(Aux3['ailment chance'])))
+        embed.add_field(name='{}: {}'.format(Move.lower(), i), value='{}'.format(Aux3.effect_entries[0].short_effect).replace('$effect_chance%','{}%'.format(Aux3.effect_chance)))
         if Immune:
             embed.add_field(name='Type',value='{} is immune often.'.format(MonB))
-        if Aux3['category'] != 'status':
-            DMG = pokemon.Calc.attack_calc(ATK, DEF, int(Aux3['power']), Level1, Multiplier*RandomValue, False)
-            DMG2 = pokemon.Calc.attack_calc(ATK, DEF, int(Aux3['power']), Level1, Multiplier*RandomValue, True)
-            embed.add_field(name='Acc roll',value='{}\n{}'.format(acc_value(Aux3['accuracy']), crit_value()))
+        if Aux3.damage_class.name != 'status' and Aux3.meta.category.name != 'ohko':
+            DMG = pokemon.Calc.attack_calc(ATK, DEF, Aux3.power, Level1, Multiplier*RandomValue, False)
+            DMG2 = pokemon.Calc.attack_calc(ATK, DEF, Aux3.power, Level1, Multiplier*RandomValue, True)
+            embed.add_field(name='Acc roll',value='{}\n{}'.format(acc_value(Aux3.accuracy), crit_value()))
             embed.add_field(name='Damage', value='{} = {}%'.format(DMG, round(DMG * 100 / HP, 2)))
             embed.add_field(name='Crit. hit. damage'.format(MonA, MonB, HP),value='{} = {}%'.format(DMG2, round(DMG2 * 100 / HP, 2)))
         else: 
-            embed.add_field(name='Acc roll',value='{}'.format(acc_value(Aux3['accuracy'])))
-        if Aux3['ailment chance'] != "0" and random() <= int(Aux3['ailment chance'])/100:
-            embed.add_field(name='Effect Roll',value='{} got [{}] unless prevented'.format(MonB, Aux3['ailment']),)
-        if Aux3['stat chance'] != "0" and random() <= int(Aux3['ailment chance'])/100:
-            embed.add_field(name='Stat chance roll',value='Check Description')
-        if Aux3['critical rate'] != "0":
-            embed.add_field(name='Crit. rate',value='+{}'.format(Aux3['critical rate']))
-        if Aux3['drain'] != "0":
-            embed.add_field(name='Drained HP',value='+{}. Crit. {}'.format(round(DMG/100 * int(Aux3['drain']), 2),round(DMG2/100 * int(Aux3['drain'])), 2))
-        if Aux3['healing'] != "0":
-            embed.add_field(name='Healed HP',value='+{}.'.format(round(HP/100 * int(Aux3['healing'])), 2))
-        if Aux3['flinch chance'] != "0" and random() <= int(Aux3['flinch chance'])/100:
-            embed.add_field(name='Flinch',value='{} has flinched'.format(MonB))
+            embed.add_field(name='Acc roll', value='{}'.format(acc_value(Aux3.accuracy)))
+        
+        if Aux3.meta.ailment_chance != 0 and random() <= Aux3.meta.ailment_chance/100:
+            embed.add_field(name='Effect Roll', value='{} got [{}] unless prevented'.format(MonB, Aux3.meta.ailment.name))
+        
+        if Aux3.meta.stat_chance != 0 and random() <= Aux3.meta.ailment_chance/100:
+            embed.add_field(name='Stat chance roll', value='Check Description')
+        
+        if Aux3.meta.crit_rate != 0:
+            embed.add_field(name='Crit. rate', value='+{}'.format(Aux3.meta.crit_rate))
+
+        if Aux3.meta.drain != 0:
+            embed.add_field(name='Drained HP', value='+{}. Crit. {}'.format(
+                round(DMG/100 * Aux3.meta.drain, 2),
+                round(DMG2/100 * Aux3.meta.drain, 2)
+                )
+            )
+
+        if Aux3.meta.healing != "0":
+            embed.add_field(name='Healed HP',value='+{}.'.format(
+                round(HP/100 * Aux3.meta.healing, 2)
+                )
+            )
+
+        if Aux3.meta.flinch_chance != 0 and random() <= Aux3.meta.flinch_chance/100:
+            embed.add_field(name='Flinch', value='{} has flinched'.format(MonB))
         embed.set_footer(text='{}►{} | {}% | {}x'.format(MonA, MonB, round(RandomValue, 2), Multiplier))
         await ctx.send(embed=embed)
 
@@ -127,9 +138,7 @@ async def battle(ctx, MonA: str, MonB: str, Move: str, Multiplier=1.0, Level1=10
 @BOT.command(pass_context=True)
 async def help(ctx, args=''):
     print(ctx.message.author)
-    embed = discord.Embed(
-        colour=discord.Colour.dark_red()
-    )
+    embed = discord.Embed(colour=discord.Colour.dark_red())
     embed.set_author(name='Help')
     embed.add_field(name='{}Help'.format(BOT.command_prefix),value='Main Help command, 3 pages.')
     if args == '1':
