@@ -1,14 +1,7 @@
 import math
 import textwrap
 import os
-import json
 import pokebase as pb
-
-SCRIPT_DIR = os.path.dirname(__file__)
-FILE_PATH = os.path.join(SCRIPT_DIR, 'database/database.json')
-
-with open(FILE_PATH, 'r') as f:
-    DISTROS_DICT = json.load(f)
 
 def index_2d(_data, _search):
     for i, value in enumerate(_data):
@@ -40,25 +33,25 @@ class Calc:
         result = 1
         types = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy', 'typeless']
         chart = [
-            [1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0.5,	0,	1,	1,	0.5,	1],
-            [1,	0.5,	0.5,	1,	2,	2,	1,	1,	1,	1,	1,	2,	0.5,	1,	0.5,	1,	2,	1],
-            [1,	2,	0.5,	1,	0.5,	1,	1,	1,	2,	1,	1,	1,	2,	1,	0.5,	1,	1,	1],
-            [1,	1,	2,	0.5,	0.5,	1,	1,	1,	0,	2,	1,	1,	1,	1,	0.5,	1,	1,	1],
-            [1,	0.5,	2,	1,	0.5,	1,	1,	0.5,	2,	0.5,	1,	0.5,	2,	1,	0.5,	1,	0.5,	1],
-            [1,	0.5,	0.5,	1,	2,	0.5,	1,	1,	2,	2,	1,	1,	1,	1,	2,	1,	0.5,	1],
-            [2,	1,	1,	1,	1,	2,	1,	0.5,	1,	0.5,	0.5,	0.5,	2,	0,	1,	2,	2,	0.5],
-            [1,  1,	1,	1,	2,	1,	1,	0.5,	0.5,	1,	1,	1,	0.5,	0.5,	1,	1,	0,	2],
-            [1,	2,	1,	2,	0.5,	1,	1,	2,	1,	0,	1,	0.5,	2,	1,	1,	1,	2,	1],
-            [1,	1,	1,	0.5,	2,	1,	2,	1,	1,	1,	1,	2,	0.5,	1,	1,	1,	0.5,	1],
-            [1,	1,	1,	1,	1,	1,	2,	2,	1,	1,	0.5,	1,	1,	1,	1,	0,	0.5,	1],
-            [1,	0.5,	1,	1,	2,	1,	0.5,	0.5,	1,	0.5,	2,	1,	1,	0.5,	1,	2,	0.5,	0.5],
-            [1,	2,	1,	1,	1,	2,	0.5,	1,	0.5,	2,	1,	2,	1,	1,	1,	1,	0.5,	1],
-            [0,	1,	1,	1,	1,	1,	1,	1,	1,	1,	2,	1,	1,	2,	1,	0.5,	1,	1],
-            [1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	2,	1,	0.5,	0],
-            [1,	1,	1,	1,	1,	1,	0.5,	1,	1,	1,	2,	1,	1,	2,	1,	0.5,	1,	0.5],
-            [1,	0.5,	0.5,	0.5,	1,	2,	1,	1,	1,	1,	1,	1,	2,	1,	1,	1,	0.5,	2],
-            [1,	0.5,	1,	1,	1,	1,	2,	0.5,	1,	1,	1,	1,	1,	1,	2,	2,	0.5,	1],
-            [1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1]
+            [1, 1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0.5,	0,	1,	1,	0.5,	1],
+            [1, 0.5,	0.5,	1,	2,	2,	1,	1,	1,	1,	1,	2,	0.5,	1,	0.5,	1,	2,	1],
+            [1, 2,	0.5,	1,	0.5,	1,	1,	1,	2,	1,	1,	1,	2,	1,	0.5,	1,	1,	1],
+            [1, 1,	2,	0.5,	0.5,	1,	1,	1,	0,	2,	1,	1,	1,	1,	0.5,	1,	1,	1],
+            [1, 0.5,	2,	1,	0.5,	1,	1,	0.5,	2,	0.5,	1,	0.5,	2,	1,	0.5,	1,	0.5,	1],
+            [1, 0.5,	0.5,	1,	2,	0.5,	1,	1,	2,	2,	1,	1,	1,	1,	2,	1,	0.5,	1],
+            [2, 1,	1,	1,	1,	2,	1,	0.5,	1,	0.5,	0.5,	0.5,	2,	0,	1,	2,	2,	0.5],
+            [1, 1,	1,	1,	2,	1,	1,	0.5,	0.5,	1,	1,	1,	0.5,	0.5,	1,	1,	0,	2],
+            [1, 2,	1,	2,	0.5,	1,	1,	2,	1,	0,	1,	0.5,	2,	1,	1,	1,	2,	1],
+            [1, 1,	1,	0.5,	2,	1,	2,	1,	1,	1,	1,	2,	0.5,	1,	1,	1,	0.5,	1],
+            [1, 1,	1,	1,	1,	1,	2,	2,	1,	1,	0.5,	1,	1,	1,	1,	0,	0.5,	1],
+            [1, 0.5,	1,	1,	2,	1,	0.5,	0.5,	1,	0.5,	2,	1,	1,	0.5,	1,	2,	0.5,	0.5],
+            [1, 2,	1,	1,	1,	2,	0.5,	1,	0.5,	2,	1,	2,	1,	1,	1,	1,	0.5,	1],
+            [0, 1,	1,	1,	1,	1,	1,	1,	1,	1,	2,	1,	1,	2,	1,	0.5,	1,	1],
+            [1, 1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	2,	1,	0.5,	0],
+            [1, 1,	1,	1,	1,	1,	0.5,	1,	1,	1,	2,	1,	1,	2,	1,	0.5,	1,	0.5],
+            [1, 0.5,	0.5,	0.5,	1,	2,	1,	1,	1,	1,	1,	1,	2,	1,	1,	1,	0.5,	2],
+            [1, 0.5,	1,	1,	1,	1,	2,	0.5,	1,	1,	1,	1,	1,	1,	2,	2,	0.5,	1],
+            [1, 1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1]
         ]
         for _type in _defense:
             if _name in types and _type in types:
@@ -139,17 +132,22 @@ class Pokemon:
             _evs = [252]*6
         if _nature is None:
             _nature = [1.1]*5
+        data = pb.pokemon(_name)
         self._name = _name
-        self._hp = Calc.hp_stat(DISTROS_DICT['Pokemon'][_name]['base stats']['HP'], _lvl, _ivs[0], _evs[0])
-        self._attack = Calc.stat(DISTROS_DICT['Pokemon'][_name]['base stats']['Attack'], _lvl, _ivs[1], _evs[1], _nature[0])
-        self._defense = Calc.stat(DISTROS_DICT['Pokemon'][_name]['base stats']['Defense'], _lvl, _ivs[2], _evs[2], _nature[1])
-        self._sp_attack = Calc.stat(DISTROS_DICT['Pokemon'][_name]['base stats']['Sp. Attack'], _lvl, _ivs[3], _evs[3], _nature[2])
-        self._sp_defense = Calc.stat(DISTROS_DICT['Pokemon'][_name]['base stats']['Sp. Defense'], _lvl, _ivs[4], _evs[4], _nature[3])
-        self._speed = Calc.stat(DISTROS_DICT['Pokemon'][_name]['base stats']['Speed'], _lvl, _ivs[5], _evs[5], _nature[4])
-        self._abilities = DISTROS_DICT['Pokemon'][_name]['abilities']
-        self._types = DISTROS_DICT['Pokemon'][_name]['types']
-        self._height = int(DISTROS_DICT['Pokemon'][_name]['height'])
-        self._weight = int(DISTROS_DICT['Pokemon'][_name]['weight'])
+        self._hp = Calc.hp_stat(data.stats[5].base_stat, _lvl, _ivs[0], _evs[0])
+        self._attack = Calc.stat(data.stats[4].base_stat, _lvl, _ivs[1], _evs[1], _nature[0])
+        self._defense = Calc.stat(data.stats[3].base_stat, _lvl, _ivs[2], _evs[2], _nature[1])
+        self._sp_attack = Calc.stat(data.stats[2].base_stat, _lvl, _ivs[3], _evs[3], _nature[2])
+        self._sp_defense = Calc.stat(data.stats[1].base_stat, _lvl, _ivs[4], _evs[4], _nature[3])
+        self._speed = Calc.stat(data.stats[0].base_stat, _lvl, _ivs[5], _evs[5], _nature[4])
+        self._abilities = []
+        for item in data.abilities:
+            self._abilities.append(item.ability.name)
+        self._types = []
+        for item in data.types:
+            self._abilities.append(item.type.name)
+        self._height = data.height
+        self._weight = data.weight
 
     def __repr__(self):
         return(

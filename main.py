@@ -11,7 +11,7 @@ from random import randint, random
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_TOKEN = os.getenv("GUILD_ID")
 
-BOT = commands.Bot(command_prefix='$',description='Bot that handles pokemon combat.')
+BOT = commands.Bot(command_prefix='$', description='Bot that handles pokemon combat.')
 BOT.remove_command('help')
 
 
@@ -97,11 +97,11 @@ async def battle(ctx, MonA: str, MonB: str, Move: str, Multiplier=1.0, Level1=10
         embed.set_author(name=Move.lower())
         embed.add_field(name='{}: {}'.format(Move.lower(), i), value='{}'.format(Aux3.effect_entries[0].short_effect).replace('$effect_chance%','{}%'.format(Aux3.effect_chance)))
         if Immune:
-            embed.add_field(name='Type',value='{} is immune often.'.format(MonB))
+            embed.add_field(name='Type', value='{} is immune often.'.format(MonB))
         if Aux3.damage_class.name != 'status' and Aux3.meta.category.name != 'ohko':
             DMG = pokemon.Calc.attack_calc(ATK, DEF, Aux3.power, Level1, Multiplier*RandomValue, False)
             DMG2 = pokemon.Calc.attack_calc(ATK, DEF, Aux3.power, Level1, Multiplier*RandomValue, True)
-            embed.add_field(name='Acc roll',value='{}\n{}'.format(acc_value(Aux3.accuracy), crit_value()))
+            embed.add_field(name='Acc roll', value='{}\n{}'.format(acc_value(Aux3.accuracy), crit_value()))
             embed.add_field(name='Damage', value='{} = {}%'.format(DMG, round(DMG * 100 / HP, 2)))
             embed.add_field(name='Crit. hit. damage'.format(MonA, MonB, HP),value='{} = {}%'.format(DMG2, round(DMG2 * 100 / HP, 2)))
         else: 
@@ -117,20 +117,13 @@ async def battle(ctx, MonA: str, MonB: str, Move: str, Multiplier=1.0, Level1=10
             embed.add_field(name='Crit. rate', value='+{}'.format(Aux3.meta.crit_rate))
 
         if Aux3.meta.drain != 0:
-            embed.add_field(name='Drained HP', value='+{}. Crit. {}'.format(
-                round(DMG/100 * Aux3.meta.drain, 2),
-                round(DMG2/100 * Aux3.meta.drain, 2)
-                )
-            )
+            embed.add_field(name='Drained HP', value='+{}. Crit. {}'.format(round(DMG/100 * Aux3.meta.drain, 2), round(DMG2/100 * Aux3.meta.drain, 2)))
 
-        if Aux3.meta.healing != "0":
-            embed.add_field(name='Healed HP',value='+{}.'.format(
-                round(HP/100 * Aux3.meta.healing, 2)
-                )
-            )
+        if Aux3.meta.healing != 0:embed.add_field(name='Healed HP', value='+{}.'.format(round(HP/100 * Aux3.meta.healing, 2)))
 
         if Aux3.meta.flinch_chance != 0 and random() <= Aux3.meta.flinch_chance/100:
             embed.add_field(name='Flinch', value='{} has flinched'.format(MonB))
+
         embed.set_footer(text='{}►{} | {}% | {}x'.format(MonA, MonB, round(RandomValue, 2), Multiplier))
         await ctx.send(embed=embed)
 
