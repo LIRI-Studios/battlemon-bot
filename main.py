@@ -95,36 +95,37 @@ async def battle(ctx, MonA: str, MonB: str, Move: str, Multiplier=1.0, Level1=10
         RandomValue = randint(85, 100)/100
         embed = discord.Embed(colour=discord.Colour.dark_red())
         embed.set_author(name=Move.lower())
-        embed.add_field(name='{}: {}'.format(Move.lower(), i), value='{}'.format(Aux3.effect_entries[0].short_effect).replace('$effect_chance%','{}%'.format(Aux3.effect_chance)))
+        embed.add_field(name='{}: {}'.format(Move.lower(), i), value='{}'.format(Aux3.effect_entries[0].short_effect).replace('$effect_chance%','{}%'.format(Aux3.effect_chance)), inline=False)
         if Immune:
-            embed.add_field(name='Type', value='{} is immune often.'.format(MonB))
+            embed.add_field(name='Type', value='{} is immune often.'.format(MonB), inline=False)
         if Aux3.damage_class.name != 'status' and Aux3.meta.category.name != 'ohko':
             DMG = pokemon.Calc.attack_calc(ATK, DEF, Aux3.power, Level1, Multiplier*RandomValue, False)
             DMG2 = pokemon.Calc.attack_calc(ATK, DEF, Aux3.power, Level1, Multiplier*RandomValue, True)
-            embed.add_field(name='Acc roll', value='{}\n{}'.format(acc_value(Aux3.accuracy), crit_value()))
-            embed.add_field(name='Damage', value='{} = {}%'.format(DMG, round(DMG * 100 / HP, 2)))
-            embed.add_field(name='Crit. hit. damage'.format(MonA, MonB, HP),value='{} = {}%'.format(DMG2, round(DMG2 * 100 / HP, 2)))
+            embed.add_field(name='Acc roll', value='{}\n{}'.format(acc_value(Aux3.accuracy), crit_value()), inline=False)
+            embed.add_field(name='Damage', value='{} = {}%'.format(DMG, round(DMG * 100 / HP, 2)), inline=False)
+            embed.add_field(name='Crit. hit. damage'.format(MonA, MonB, HP),value='{} = {}%'.format(DMG2, round(DMG2 * 100 / HP, 2)), inline=False)
         else: 
-            embed.add_field(name='Acc roll', value='{}'.format(acc_value(Aux3.accuracy)))
+            embed.add_field(name='Acc roll', value='{}'.format(acc_value(Aux3.accuracy)), inline=False)
         
         if Aux3.meta.ailment_chance != 0 and random() <= Aux3.meta.ailment_chance/100:
-            embed.add_field(name='Effect Roll', value='{} got [{}] unless prevented'.format(MonB, Aux3.meta.ailment.name))
+            embed.add_field(name='Effect Roll', value='{} got [{}] unless prevented'.format(MonB, Aux3.meta.ailment.name), inline=False)
         
         if Aux3.meta.stat_chance != 0 and random() <= Aux3.meta.ailment_chance/100:
-            embed.add_field(name='Stat chance roll', value='Check Description')
+            embed.add_field(name='Stat chance roll', value='Check Description', inline=False)
         
         if Aux3.meta.crit_rate != 0:
-            embed.add_field(name='Crit. rate', value='+{}'.format(Aux3.meta.crit_rate))
+            embed.add_field(name='Crit. rate', value='+{}'.format(Aux3.meta.crit_rate), inline=False)
 
         if Aux3.meta.drain != 0:
-            embed.add_field(name='Drained HP', value='+{}. Crit. {}'.format(round(DMG/100 * Aux3.meta.drain, 2), round(DMG2/100 * Aux3.meta.drain, 2)))
+            embed.add_field(name='Drained HP', value='+{}. Crit. {}'.format(round(DMG/100 * Aux3.meta.drain, 2), round(DMG2/100 * Aux3.meta.drain, 2)), inline=False)
 
-        if Aux3.meta.healing != 0:embed.add_field(name='Healed HP', value='+{}.'.format(round(HP/100 * Aux3.meta.healing, 2)))
+        if Aux3.meta.healing != 0:
+            embed.add_field(name='Healed HP', value='+{}.'.format(round(HP/100 * Aux3.meta.healing, 2)), inline=False)
 
         if Aux3.meta.flinch_chance != 0 and random() <= Aux3.meta.flinch_chance/100:
-            embed.add_field(name='Flinch', value='{} has flinched'.format(MonB))
+            embed.add_field(name='Flinch', value='{} has flinched'.format(MonB), inline=False)
 
-        embed.set_footer(text='{}►{} | {}% | {}x'.format(MonA, MonB, round(RandomValue, 2), Multiplier))
+        embed.set_footer(text='{}►{} | {}% | {}x'.format(MonA, MonB, round(RandomValue, 2), Multiplier), inline=False)
         await ctx.send(embed=embed)
 
 
