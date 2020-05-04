@@ -67,9 +67,9 @@ async def stats(ctx, Mon, Lvl=100):
 
 @BOT.command(pass_context=True)
 async def battle(ctx, MonA: str, MonB: str, Move: str, Multiplier=1.0, Level1=100, Level2=100):
-    Aux1 = pb.pokemon(MonA)
-    Aux2 = pb.pokemon(MonB)
-    Aux3 = pb.move(Move)
+    Aux1 = pb.pokemon(MonA.lower())
+    Aux2 = pb.pokemon(MonB.lower())
+    Aux3 = pb.move(Move.lower())
     types1 = []
     types2 = []
     for item in Aux1.types:
@@ -125,7 +125,7 @@ async def battle(ctx, MonA: str, MonB: str, Move: str, Multiplier=1.0, Level1=10
         if Aux3.meta.flinch_chance != 0 and random() <= Aux3.meta.flinch_chance/100:
             embed.add_field(name='Flinch', value='{} has flinched'.format(MonB), inline=False)
 
-        embed.set_footer(text='{}►{} | {}% | {}x'.format(MonA, MonB, round(RandomValue, 2), Multiplier), inline=False)
+        embed.set_footer(text='{}►{} | {}% | {}x'.format(MonA, MonB, round(RandomValue*100, 2), Multiplier))
         await ctx.send(embed=embed)
 
 

@@ -27,7 +27,7 @@ class Calc:
         if _crit:
             _lvl *= 2
         return math.floor(_mul * (math.floor(math.floor(math.floor(2 * _lvl / 5 + 2) * _pwr * _atk / _def) / 50) + 2))
-
+       
     @staticmethod
     def type_effectiveness(_attack=[], _name='typeless', _defense=[]):
         result = 1
