@@ -1,6 +1,6 @@
 # settings.py
+# import settings
 import os
-import settings
 import pokemon
 import discord
 import pokebase as pb
@@ -8,12 +8,13 @@ from discord.ext import commands
 from tinydb import TinyDB, Query
 from random import randint, random
 
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD_TOKEN = os.getenv("GUILD_ID")
+from os import getenv
+
+# DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+# GUILD_TOKEN = os.getenv("GUILD_ID")
 
 BOT = commands.Bot(command_prefix='$', description='Bot that handles pokemon combat.')
 BOT.remove_command('help')
-
 
 @BOT.event
 async def on_ready():
@@ -23,11 +24,9 @@ async def on_ready():
     activity = discord.Game(name='{}help'.format(BOT.command_prefix))
     await BOT.change_presence(status=discord.Status.online, activity=activity)
 
-
 @BOT.event
 async def on_member_join():
     pass
-
 
 @BOT.event
 async def on_member_leave(member, guild):
@@ -64,6 +63,11 @@ async def stats(ctx, Mon, Lvl=100):
     embed.add_field(name='Speed', value='{}'.format(pokemon.Calc.stat(Aux1.stats[0].base_stat, Lvl)))
     embed.set_footer(text='{} | Max IVs | Favourable Nature'.format(Mon))
     await ctx.send(embed=embed)
+
+@BOT.command(pass_context=True)
+async def setup(ctx, args=''):
+    vals = args.split()
+    pass
 
 @BOT.command(pass_context=True)
 async def battle(ctx, MonA: str, MonB: str, Move: str, Multiplier=1.0, Level1=100, Level2=100):
@@ -128,7 +132,6 @@ async def battle(ctx, MonA: str, MonB: str, Move: str, Multiplier=1.0, Level1=10
         embed.set_footer(text='{}►{} | {}% | {}x'.format(MonA, MonB, round(RandomValue*100, 2), Multiplier))
         await ctx.send(embed=embed)
 
-
 @BOT.command(pass_context=True)
 async def help(ctx, args=''):
     print(ctx.message.author)
@@ -151,4 +154,4 @@ async def help(ctx, args=''):
     embed.set_footer(text='use {}help <page>'.format(BOT.command_prefix))
     await ctx.send(embed=embed)
 
-BOT.run(DISCORD_TOKEN)
+# BOT.run(DISCORD_TOKEN)
