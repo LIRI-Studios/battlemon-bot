@@ -45,153 +45,6 @@ def stats(mon, lvl=100):
     return embed
 
 
-def battle(mon_a: str, mon_b: str, move: str, multiplier=1.0, level_a=100, level_b=100):
-    aux1 = pb.pokemon(mon_a.lower())
-    aux2 = pb.pokemon(mon_b.lower())
-    aux3 = pb.move(move.lower())
-    types1 = []
-    types2 = []
-    _embeds = []
-    for item in aux1.types:
-        types1.append(item.type.name)
-    for item in aux2.types:
-        types2.append(item.type.name)
-    hp_value = hp_stat(aux2.stats[5].base_stat, level_b)
-    immune = False
-    multiplier *= type_effectiveness(
-        types1, aux3.type.name, types2)
-    if aux3.damage_class.name == 'special':
-        atk_value = stat(aux1.stats[2].base_stat, level_a)
-        if move.lower() in ['psyshock', 'psystrike', 'secret-sword']:
-            def_value = stat(aux2.stats[3].base_stat, level_b)
-        else:
-            def_value = stat(aux2.stats[1].base_stat, level_b)
-    if aux3.damage_class.name == 'physical':
-        atk_value = stat(aux1.stats[4].base_stat, level_a)
-        def_value = stat(aux2.stats[3].base_stat, level_b)
-
-    min_value = aux3.meta.min_hits if aux3.meta.min_hits is not None else 1
-    max_value = aux3.meta.max_hits if aux3.meta.min_hits is not None else 1
-    for i in range(randint(min_value, max_value)):
-        random_value = randint(85, 100)/100
-        embed = discord.Embed(colour=discord.Colour.dark_red())
-        embed.set_author(name=move.lower())
-        embed.add_field(
-            name='{}: {}'.format(move.lower(), i),
-            value='{}'.format(aux3.effect_entries[0].short_effect).replace(
-                '$effect_chance%', '{}%'.format(aux3.effect_chance)
-            ),
-            inline=False
-        )
-        if immune:
-            embed.add_field(
-                name='Type',
-                value='{} is immune often.'.format(mon_b),
-                inline=False
-            )
-        if aux3.damage_class.name != 'status' and aux3.meta.category.name != 'ohko':
-            dmg_value_a = attack_calc(
-                atk_value, def_value, aux3.power, level_a, multiplier*random_value, False)
-            dmg_value_b = attack_calc(
-                atk_value, def_value, aux3.power, level_a, multiplier*random_value, True)
-            embed.add_field(
-                name='Acc roll',
-                value='{}\n{}'.format(acc_value(aux3.accuracy), crit_value()),
-                inline=False
-            )
-            embed.add_field(
-                name='Damage',
-                value='{} = {}%'.format(
-                    dmg_value_a, round(dmg_value_a * 100 / hp_value, 2)
-                ),
-                inline=False
-            )
-            embed.add_field(
-                name='Crit. hit. damage',
-                value='{} = {}%'.format(
-                    dmg_value_b, round(dmg_value_b * 100 / hp_value, 2)
-                ),
-                inline=False
-            )
-        else:
-            embed.add_field(
-                name='Acc roll',
-                value='{}'.format(acc_value(aux3.accuracy)),
-                inline=False
-            )
-
-        if aux3.meta.ailment_chance != 0 and random() <= aux3.meta.ailment_chance/100:
-            embed.add_field(
-                name='Effect Roll',
-                value='{} got [{}] unless prevented'.format(
-                    mon_b, aux3.meta.ailment.name),
-                inline=False
-            )
-
-        if aux3.meta.stat_chance != 0 and random() <= aux3.meta.ailment_chance/100:
-            embed.add_field(
-                name='Stat chance roll',
-                value='Check Description',
-                inline=False
-            )
-
-        if aux3.meta.crit_rate != 0:
-            embed.add_field(
-                name='Crit. rate',
-                value='+{}'.format(aux3.meta.crit_rate),
-                inline=False
-            )
-
-        if aux3.meta.drain != 0:
-            embed.add_field(
-                name='Drained HP',
-                value='+{}. Crit. {}'.format(
-                    round(dmg_value_a/100 * aux3.meta.drain, 2),
-                    round(dmg_value_b/100 * aux3.meta.drain, 2)),
-                inline=False
-            )
-
-        if aux3.meta.healing != 0:
-            embed.add_field(
-                name='Healed HP',
-                value='+{}.'.format(round(hp_value / 100 *aux3.meta.healing, 2)),
-                inline=False
-            )
-
-        if aux3.meta.flinch_chance != 0 and random() <= aux3.meta.flinch_chance/100:
-            embed.add_field(
-                name='Flinch',
-                value='{} has flinched'.format(mon_b),
-                inline=False
-            )
-
-        embed.set_footer(text='{}►{} | {}% | {}x'.format(
-            mon_a, mon_b, round(random_value*100, 2), multiplier))
-        _embeds.append(embed)
-    return _embeds
-
-
-def acc_value(acc):
-    if acc == 'None':
-        return 'Can\'t miss.'
-    acc = int(acc)
-    num = random()*100
-    for i in range(9, 2, -1):
-        if 3*acc/i >= num:
-            return 'It hits. Dodgeable at +{}'.format(i-2)
-    return 'It misses.'  # Dodgeable at +0
-
-
-def crit_value():
-    num = randint(1, 16)
-    if num == 1:
-        return 'Critical Hit.'
-    for i in range(1, 5):
-        if num <= 2*i:
-            return 'Critical Hit at +{}.'.format(i)
-    return 'Not critical Hit.'
-
-
 def hp_stat(_base, _lvl=100, _ivs=31, _evs=252):
     print('HP: {}'.format(10 + math.floor(_lvl * (_base/50 + _evs/400 + _ivs/100 + 1))))
     return 10 + math.floor(_lvl * (_base/50 + _evs/400 + _ivs/100 + 1))
@@ -203,13 +56,16 @@ def stat(_base, _lvl=100, _ivs=31, _evs=252, _nat=1.1):
     return math.floor(_nat * (5 + math.floor(_lvl * (_base/50 + _evs/400 + _ivs/100 + 1))))
 
 
-def attack_calc(_atk_value, _def_value, _pwr, _lvl=100, _mul=1, _crit=False):
+def attack_calc(_atk_value, _def_value, _pwr=None, _lvl=100, _mul=1, _crit=False):
     if _crit:
         _lvl *= 2
-    return math.floor(
-        _mul * (math.floor(math.floor(math.floor(2 * _lvl / 5 + 2)
-                                      * _pwr * _atk_value / _def_value) / 50) + 2)
-    )
+    if _pwr is None:
+        return 0
+    else:
+        return math.floor(
+            _mul * (math.floor(math.floor(math.floor(2 * _lvl / 5 + 2)
+            * _pwr * _atk_value / _def_value) / 50) + 2)
+        )
 
 
 def type_effectiveness(_attack=None, _name='typeless', _def_valueense=None):
@@ -265,6 +121,157 @@ def nature(_name):
     result[coords[0]] -= 0.1
     result[coords[1]] += 0.1
     return result
+
+
+def battle(mon_a: str, mon_b: str, move: str, multiplier=1.0, level_a=100, level_b=100):
+    aux1 = pb.pokemon(mon_a.lower())
+    aux2 = pb.pokemon(mon_b.lower())
+    aux3 = pb.move(move.lower())
+    types1 = []
+    types2 = []
+    _embeds = []
+    for item in aux1.types:
+        types1.append(item.type.name)
+    for item in aux2.types:
+        types2.append(item.type.name)
+    hp_value = hp_stat(aux2.stats[5].base_stat, level_b)
+    immune = False
+    multiplier *= type_effectiveness(
+        types1, aux3.type.name, types2)
+    if aux3.damage_class.name == 'special':
+        atk_value = stat(aux1.stats[2].base_stat, level_a)
+        if move.lower() in ['psyshock', 'psystrike', 'secret-sword']:
+            def_value = stat(aux2.stats[3].base_stat, level_b)
+        else:
+            def_value = stat(aux2.stats[1].base_stat, level_b)
+    if aux3.damage_class.name == 'physical':
+        atk_value = stat(aux1.stats[4].base_stat, level_a)
+        def_value = stat(aux2.stats[3].base_stat, level_b)
+
+    min_value = aux3.meta.min_hits if aux3.meta.min_hits is not None else 1
+    max_value = aux3.meta.max_hits if aux3.meta.min_hits is not None else 1
+    for i in range(randint(min_value, max_value)):
+        random_value = randint(85, 100)/100
+        embed = discord.Embed(colour=discord.Colour.dark_red())
+        embed.set_author(name=move.lower())
+        embed.add_field(
+            name='{}: {}'.format(move.lower(), i),
+            value='{}'.format(aux3.effect_entries[0].short_effect).replace(
+                '$effect_chance%', '{}%'.format(aux3.effect_chance)
+            ),
+            inline=False
+        )
+        if immune:
+            embed.add_field(
+                name='Type',
+                value='{} is immune often.'.format(mon_b),
+                inline=False
+            )
+        if aux3.damage_class.name != 'status' and aux3.meta.category.name != 'ohko':
+            dmg_value_a = attack_calc(
+                atk_value, def_value, aux3.power, level_a, multiplier*random_value, False)
+            dmg_value_b = attack_calc(
+                atk_value, def_value, aux3.power, level_a, multiplier*random_value, True)
+            embed.add_field(
+                name='Damage',
+                value='{} = {}%'.format(
+                    dmg_value_a, round(dmg_value_a * 100 / hp_value, 2)
+                ),
+                inline=False
+            )
+            embed.add_field(
+                name='Crit. hit. damage',
+                value='{} = {}%'.format(
+                    dmg_value_b, round(dmg_value_b * 100 / hp_value, 2)
+                ),
+                inline=False
+            )
+        embed.add_field(
+            name='Acc roll',
+            value='{}{}'.format(
+                acc_value(aux3.accuracy),
+                crit_value() if aux3.meta.category.name != 'ohko' else ''
+                ),
+            inline=False
+        )
+
+        if aux3.meta.ailment_chance != 0 and random() <= aux3.meta.ailment_chance/100:
+            embed.add_field(
+                name='Effect Roll',
+                value='{} got [{}] unless prevented.'.format(
+                    mon_b, aux3.meta.ailment.name),
+                inline=False
+            )
+
+        if aux3.meta.stat_chance != 0 and random() <= aux3.meta.ailment_chance/100:
+            embed.add_field(
+                name='Stat chance roll',
+                value='Check Description',
+                inline=False
+            )
+
+        if aux3.meta.crit_rate != 0:
+            embed.add_field(
+                name='Crit. rate',
+                value='+{}'.format(aux3.meta.crit_rate),
+                inline=False
+            )
+
+        if aux3.meta.drain != 0:
+            embed.add_field(
+                name='Drained HP',
+                value='+{}. Crit. {}'.format(
+                    round(dmg_value_a/100 * aux3.meta.drain, 2),
+                    round(dmg_value_b/100 * aux3.meta.drain, 2)),
+                inline=False
+            )
+
+        if aux3.meta.healing != 0:
+            embed.add_field(
+                name='Healed HP',
+                value='+{}.'.format(round(hp_value * aux3.meta.healing / 100, 2)),
+                inline=False
+            )
+
+        if aux3.meta.flinch_chance != 0 and random() <= aux3.meta.flinch_chance/100:
+            embed.add_field(
+                name='Flinch',
+                value='{} has flinched'.format(mon_b),
+                inline=False
+            )
+
+        embed.set_footer(text='{}►{} | {}% | {}x | Gen 2 Crit. Hit'.format(
+            mon_a, mon_b, round(random_value*100, 2), multiplier))
+        _embeds.append(embed)
+    return _embeds
+
+
+def acc_value(acc):
+    if acc == 'None':
+        return 'Can\'t miss.'
+    acc = int(acc)
+    num = random()*100
+    for i in range(9, 2, -1):
+        if 3*acc/i >= num:
+            return 'It hits. Dodgeable at +{}'.format(i-2)
+    return 'It misses.'  # Dodgeable at +0
+
+
+def crit_value():
+    msg = '\nCritical Hit'
+    num = random()
+    if num <= 0.0625:
+        return msg + ' at +0.'
+    elif num <= 0.1250:
+        return msg + ' at +1.'
+    elif num <= 0.2500:
+        return msg + ' at +2.'
+    elif num <= 0.3333:
+        return msg + ' at +3.'
+    elif num <= 0.5000:
+        return msg + ' at +4.'
+    else:
+        return msg + 'not present.'
 
 
 class Character:
