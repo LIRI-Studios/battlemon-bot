@@ -31,7 +31,10 @@ class Calc:
     @staticmethod
     def type_effectiveness(_attack=[], _name='typeless', _defense=[]):
         result = 1
-        types = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy', 'typeless']
+        types = [
+            'normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying',
+            'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy', 'typeless'
+        ]
         chart = [
             [1, 1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	1,	0.5,	0,	1,	1,	0.5,	1],
             [1, 0.5,	0.5,	1,	2,	2,	1,	1,	1,	1,	1,	2,	0.5,	1,	0.5,	1,	2,	1],
@@ -83,9 +86,6 @@ class Character:
         self._types = []
         self._age = 0
         self._personality = ''
-        self._occupation = ''
-        self._likes = ''
-        self._dislikes = ''
         self._height = 0
         self._weight = 0
         self._strenghts = ''
@@ -93,6 +93,7 @@ class Character:
         self._abilities = []
         self._sp_ability = ''
         self._backstory = ''
+        self._additional_information = ''
         self._image = ''
 
     def __str__(self):
@@ -105,9 +106,6 @@ class Character:
             + '\n**Type:** {}'.format(', '.join(self._types))
             + '\n**Age:** {}'.format(self._age)
             + '\n**Personality:** {}'.format(wrapper.fill(self._personality))
-            + '\n\n**Occupation:** {}'.format(wrapper.fill(self._occupation))
-            + '\n\n**Likes:** {}'.format(wrapper.fill(self._likes))
-            + '\n\n**Dislikes:** {}'.format(wrapper.fill(self._dislikes))
             + '\n\n**-----   -----   -----'
             + '\n**Height:** {}'.format(self._height)
             + '\n**Weight:** {}'.format(self._weight)
@@ -119,6 +117,7 @@ class Character:
             + '\n\n**Special Ability:** {}'.format(wrapper.fill(self._species))
             + '\n-----   -----   -----'
             + '\n**Backstory:** {}'.format(wrapper.fill(self._backstory))
+            + '\n**Additional Information:** {}'.format(wrapper.fill(self._additional_information))
             + '\n-----   -----   -----Image:-----   -----   -----'
             + '\n{}'.format(self._image)
         )

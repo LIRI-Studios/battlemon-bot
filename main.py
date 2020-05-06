@@ -10,7 +10,7 @@ from random import randint, random
 
 from os import getenv
 
-# DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
+DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 # GUILD_TOKEN = os.getenv("GUILD_ID")
 
 BOT = commands.Bot(command_prefix='$', description='Bot that handles pokemon combat.')
@@ -154,4 +154,4 @@ async def help(ctx, args=''):
     embed.set_footer(text='use {}help <page>'.format(BOT.command_prefix))
     await ctx.send(embed=embed)
 
-# BOT.run(DISCORD_TOKEN)
+BOT.run(DISCORD_TOKEN)
