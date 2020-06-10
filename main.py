@@ -1,28 +1,49 @@
+
 import os
 import discord
-from discord.ext import commands
+import settings
 import pokemon
+from discord.ext import commands
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-# GUILD_TOKEN = os.getenv("GUILD_ID")
-BOT = commands.Bot(command_prefix='$', description='Bot that handles pokemon combat.')
+GUILD_TOKEN = os.getenv("GUILD_ID")
+BOT = commands.Bot(command_prefix='rp!',
+                   description='Bot that handles pokemon combat.')
 BOT.remove_command('help')
+
+
+@BOT.event
+async def on_message(message):
+    # we do not want the bot to reply to itself
+    if message.author == BOT.user:
+        return
+    if not message.author.bot:
+        await BOT.process_commands(message)
+        return
+    raw = [pos for pos, char in enumerate(message.content) if char == '[']
+    raw2 = [pos for pos, char in enumerate(message.content) if char == ']']
+    if len(raw) != 0 and len(raw) == len(raw2):
+        for i in range(len(raw)):
+            move = str(message.content[raw[i]+1:raw2[i]]
+                       ).replace(' ', '-').lower()
+            print(move)
+            await message.channel.send(embed=pokemon.move(move))
+
 # Function to load stats
 @BOT.command(pass_context=True)
 async def stats(ctx, mon, lvl=100):
     await ctx.send(embed=pokemon.stats(mon, lvl))
 
-# Function to setup properties
+# Function to calculate battle moves against species
 @BOT.command(pass_context=True)
-async def setup(ctx, args=''):
-    vals = args.split()
-    await ctx.send(', '.join(vals))
+async def battle(ctx, mon_a: str, mon_b: str, move: str, multiplier=1.0):
+    embeds = pokemon.battle(mon_a, mon_b, move, multiplier)
+    for embed in embeds:
+        await ctx.send(embed=embed)
 
 # Function to calculate battle moves
 @BOT.command(pass_context=True)
-async def battle(ctx, mon_a: str, mon_b: str, move: str, multiplier=1.0, level_a=100, level_b=100):
-    embeds = pokemon.battle(mon_a, mon_b, move, multiplier, level_a, level_b)
-    for embed in embeds:
-        await ctx.send(embed=embed)
+async def move(ctx, move: str):
+    await ctx.send(embed=pokemon.move(move))
 
 # Function to get commands information
 @BOT.command(pass_context=True)
@@ -76,5 +97,13 @@ async def help(ctx, args=''):
 
     embed.set_footer(text='use {}help <page>'.format(BOT.command_prefix))
     await ctx.send(embed=embed)
+
+
+@BOT.event
+async def on_ready():
+    print('Logged in as')
+    print(BOT.user.name)
+    print(BOT.user.id)
+    print('------')
 
 BOT.run(DISCORD_TOKEN)
