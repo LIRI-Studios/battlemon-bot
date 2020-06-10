@@ -1,13 +1,10 @@
 
 import os
 import discord
-import settings
 import pokemon
 from discord.ext import commands
-DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD_TOKEN = os.getenv("GUILD_ID")
-BOT = commands.Bot(command_prefix='rp!',
-                   description='Bot that handles pokemon combat.')
+DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
+BOT = commands.Bot(command_prefix='rp!', description='Bot that handles pokemon combat.')
 BOT.remove_command('help')
 
 
